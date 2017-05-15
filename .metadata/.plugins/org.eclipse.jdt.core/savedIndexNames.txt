@@ -1,0 +1,2 @@
+INDEX VERSION 1.129+C:\Users\Rafa³\Desktop\Fizyka Projekt\Ising-Model-Simulator---Java-Swing-Application\.metadata\.plugins\org.eclipse.jdt.core
+2116998098.index

@@ -1,0 +1,211 @@
+import java.awt.Color;
+import java.awt.Dimension;
+import java.awt.GridLayout;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.util.Random;
+import static java.lang.Math.*;
+import javax.swing.JButton;
+import javax.swing.JFrame;
+import javax.swing.JLabel;
+
+public class Web extends JFrame {
+	
+	//JButton[][] button = new JButton[100][100];
+	JLabel[][] label = new JLabel[100][100];
+	short[][] table = new short[100][100];
+	int counter =0;
+	Random random = new Random();
+	
+	public Web(){ 				//constructor	
+		setDefaultCloseOperation(EXIT_ON_CLOSE);
+		setTitle("Isign Model Symulation Visualisation by Rafa³ Cieæwierz");
+		setLayout(new GridLayout(100,100));
+		setLocation(100, 100);
+		
+		for (int i=0;i<100;i++)
+		{
+			for (int j=0;j<100;j++)
+			{
+				
+				label[i][j] = new JLabel("");
+				label[i][j].setOpaque(true);
+				if(random.nextInt(2)==0)
+				{
+					label[i][j].setBackground(Color.blue);
+					label[i][j].setName("-1");
+				}	
+				else
+				{
+					label[i][j].setBackground(Color.red);
+					label[i][j].setName("1");
+				}			
+				label[i][j].setPreferredSize( new Dimension(1,1));
+				add(label[i][j]);
+			}	
+		}
+		pack();
+		setSize(400,400);
+		setVisible(true);
+	}
+	//-----------------------------------------------------------------------------------------		
+
+	public void monteCarloStep()
+	{
+		int x=0 ,y = 0;
+		int ep= 0, ek=0, o=0;
+		
+		double p=0;
+		double temp=1;
+		for (int i=0;i<100;i++)
+		{
+			
+			for (int j=0;j<100;j++)
+			{
+				x = random.nextInt(100);
+				y = random.nextInt(100);
+				//System.out.println("x " + x + " y "+y);
+				double r = random.nextInt(32000)/32000.0;
+				
+				if(x==0){
+					if(y==0){
+						o= Integer.parseInt(label[y+1][x].getName()) + Integer.parseInt(label[y][x+1].getName()) + Integer.parseInt(label[99][x].getName()) + Integer.parseInt(label[y][99].getName());
+						ep = Integer.parseInt(label[y][x].getName()) + o ;
+						ek = reverseLabel(x,y) + o;
+						//System.out.println("Posz³o x= 0 i y = 0");
+					}
+					else if(y==99){
+						o= Integer.parseInt(label[0][x].getName()) + Integer.parseInt(label[y][x+1].getName()) + Integer.parseInt(label[y-1][x].getName()) + Integer.parseInt(label[y][99].getName());
+						ep = Integer.parseInt(label[y][x].getName()) + o ;
+						ek = reverseLabel(x,y) + o;
+						//System.out.println("Posz³o x= 0 i y = 99");
+					}
+					else{
+						o= Integer.parseInt(label[y+1][x].getName()) + Integer.parseInt(label[y][x+1].getName()) + Integer.parseInt(label[y-1][x].getName()) + Integer.parseInt(label[y][99].getName());
+						ep = Integer.parseInt(label[y][x].getName()) + o ;
+						ek = reverseLabel(x,y) + o;
+						//System.out.println("Posz³o x= 0 i y = else");
+					}
+				}
+				else if(x==99)
+				{
+					if(y==0){
+						o= Integer.parseInt(label[y+1][x].getName()) + Integer.parseInt(label[y][0].getName()) + Integer.parseInt(label[99][x].getName()) + Integer.parseInt(label[y][x-1].getName());
+						ep = Integer.parseInt(label[y][x].getName()) + o ;
+						ek = reverseLabel(x,y) + o;
+						//System.out.println("Posz³o x= 99 i y = 0");
+						}
+					else if(y==99){
+						o= Integer.parseInt(label[0][x].getName()) + Integer.parseInt(label[y][0].getName()) + Integer.parseInt(label[y-1][x].getName()) + Integer.parseInt(label[y][x-1].getName());
+						ep = Integer.parseInt(label[y][x].getName()) + o ;
+						ek = reverseLabel(x,y) + o;
+						//System.out.println("Posz³o x= 99 i y = 99");
+					}
+					else{						
+						o= Integer.parseInt(label[y+1][x].getName()) + Integer.parseInt(label[y][0].getName()) + Integer.parseInt(label[y-1][x].getName()) + Integer.parseInt(label[y][x-1].getName());
+						ep = Integer.parseInt(label[y][x].getName()) + o ;
+						ek = reverseLabel(x,y) + o;
+						//System.out.println("Posz³o x= 99 i y = else");
+					}	
+				}
+				else if(y==0)
+				{
+						o= Integer.parseInt(label[y+1][x].getName()) + Integer.parseInt(label[y][x+1].getName()) + Integer.parseInt(label[99][x].getName()) + Integer.parseInt(label[y][x-1].getName());
+						ep = Integer.parseInt(label[y][x].getName()) + o ;
+						ek = reverseLabel(x,y) + o;
+						//System.out.println("Posz³o x= else i y = 0");
+
+				}
+				else if(y==99)
+				{
+					o= Integer.parseInt(label[0][x].getName()) + Integer.parseInt(label[y][x+1].getName()) + Integer.parseInt(label[y-1][x].getName()) + Integer.parseInt(label[y][x-1].getName());
+					ep = Integer.parseInt(label[y][x].getName()) + o ;
+					ek = reverseLabel(x,y) + o;
+					//System.out.println("Posz³o x= else i y = 99");
+
+				}
+				else{
+					o= Integer.parseInt(label[y+1][x].getName()) + Integer.parseInt(label[y][x+1].getName()) + Integer.parseInt(label[y-1][x].getName()) + Integer.parseInt(label[y][x-1].getName());
+					ep = Integer.parseInt(label[y][x].getName()) + o ;
+					ek = reverseLabel(x,y) + o;
+					//System.out.println("Posz³o x= else  i y = else");
+				}
+				
+				if(-ek<-ep)
+					{
+						setLabel(y,x,reverseLabel(x,y));
+						//System.out.println("owroci³em po energii");
+					}
+				else{
+					p=exp(-(ek-ep)/(temp));
+					if(r<=p) 
+						{
+							setLabel(y,x,reverseLabel(x,y));
+							//System.out.println("owroci³em po prawdopodobienstwie");
+						}
+				}
+				//System.out.println("p="+p+" ,ep= "+ep+" ,ek= "+ek+"  ,abs:"+abs(ep-ek));
+				//label[random.nextInt(100)][random.nextInt(100)].setBackground(Color.BLACK);
+
+				}
+		}
+		//System.out.println("p="+p+" ,ep= "+ep+" ,ek= "+ek+"  ,abs:"+abs(ep-ek));//,r= "+r+"
+		//for(int k=0;k<1;k++) System.out.println("ep="+Integer.toString(ep) + " ek="+ Integer.toString(ek)+ " r="+ Integer.toString(o));
+	}
+	
+	//-----------------------------------------------------------------------------------------	
+	
+	public int reverseLabel(int x, int y)
+	{
+		if(Integer.parseInt(label[y][x].getName()) == 1) return -1;
+		else return 1;
+		
+	}
+	
+	//-----------------------------------------------------------------------------------------	
+	
+	public void colorUpdate()
+	{
+		for(int i=0; i<100;i++)
+		{
+			for(int j=0; j<100; j++)
+			{
+				if(label[j][i].getBackground()==Color.blue & label[j][i].getName().equals("1")) label[j][i].setBackground(Color.red);
+				if(label[j][i].getBackground()==Color.red & label[j][i].getName().equals("-1")) label[j][i].setBackground(Color.blue);
+			}
+		}
+	}
+	
+	//-----------------------------------------------------------------------------------------	
+	/*
+	public String getLabel(int i, int j)
+	{
+		return label[i][j].getName();
+	}
+	*/
+	
+	//-----------------------------------------------------------------------------------------	
+	
+	public void setLabel(int i, int j, int v)
+	{
+		label[i][j].setName(Integer.toString(v));
+	}
+	
+	public String summary()
+	{
+		int sum =0;
+		double wynik = 0;
+		for(int i=0; i<100;i++)
+		{
+			for(int j=0; j<100; j++)
+			{
+				sum = sum + Integer.parseInt(label[i][j].getName());
+			}
+		}
+		System.out.println("SUMA wynosi: " + sum);
+		wynik = sum /10000.0;
+		return Double.toString(wynik);
+	}
+	
+	
+}
